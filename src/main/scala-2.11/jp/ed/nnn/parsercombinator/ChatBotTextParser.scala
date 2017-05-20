@@ -8,7 +8,7 @@ object ChatBotTextParser extends JavaTokenParsers {
 
   def commandList: Parser[List[Command]] = rep(command)
 
-  def command: Parser[Command] = replyCommand | timeCommand
+  def command: Parser[Command] = replyCommand | timeCommand | titleMatchScheduleCommand
 
   def replyCommand: Parser[ReplyCommand] =
     "(" ~ "reply" ~ string ~ replyList ~ ")" ^^ {t => ReplyCommand(t._1._1._2.r, t._1._2) }
@@ -23,6 +23,10 @@ object ChatBotTextParser extends JavaTokenParsers {
         t._1._1._1._2.toInt,
         t._1._1._2,
         t._1._2) }
+  def titleMatchScheduleCommand: Parser[TitleMatchScheduleCommand] =
+    "(" ~ "title-match-schedule" ~ string ~ replyList ~ ")" ^^ {
+      t => TitleMatchScheduleCommand(t._1._1._2.r, t._1._2)
+    }
 
   def digits : Parser[String] = "[0-9]+".r
 

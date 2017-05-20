@@ -1,5 +1,10 @@
 (chatbot
-    (time ".*" 5 13 "Asia/Tokyo" (
+    (title-match-schedule ".*(次のタイトル戦).*" (
+            "楽しみだね"
+            "どっちが勝つかな"
+            "戦型予想は？"
+        ))
+    (time ".*(起きた).*" 5 13 "Asia/Tokyo" (
         "早起きだね"
         "おはよう"
     ))
