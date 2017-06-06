@@ -52,15 +52,24 @@ case class TitleMatchScheduleCommand(regex: Regex, replies: List[String]) extend
   def hasNextMatch: (Boolean, String) = {
     val text = Source.fromFile("./title-match-schedules.txt").mkString
     val schedules: (String, List[(List[Int], String)]) = ScheduleParser(text)
+    /* (title-match-schedules,
+     List(
+     (List(2017, 5, 26),"名人戦第5局1日目"),(List(5, 27),"名人戦第5局2日目"),
+     (List(2017, 6, 5),"名人戦第6局1日目"),(List(6, 6),"名人戦第6局2日目"),
+     (List(2017, 6, 21),"名人戦第7局1日目"),(List(6, 22),"名人戦第7局2日目"))
+     )*/
     val now = LocalDateTime.now().atZone(ZoneId.of("Asia/Tokyo"))
-    val date = (now.getMonthValue, now.getDayOfMonth)
-
+    val date = (now.getYear, now.getMonthValue, now.getDayOfMonth)
     def hasNextMatchRec(scheduleList: List[(List[Int], String)]): (Boolean, String) = {
       if (scheduleList.nonEmpty) {
         scheduleList.head._1.head compare date._1 match {
           case 1 => (true, formatSchedule(scheduleList.head))
           case 0 => scheduleList.head._1(1) compare date._2 match {
-            case 1 | 0 => (true, formatSchedule(scheduleList.head))
+            case 1 => (true, formatSchedule(scheduleList.head))
+            case 0 => scheduleList.head._1(2) compare date._3 match {
+              case 1 | 0 => (true, formatSchedule(scheduleList.head))
+              case -1 => hasNextMatchRec(scheduleList.tail)
+            }
             case -1 => hasNextMatchRec(scheduleList.tail)
           }
           case -1 => hasNextMatchRec(scheduleList.tail)
@@ -68,12 +77,13 @@ case class TitleMatchScheduleCommand(regex: Regex, replies: List[String]) extend
       } else {
         (false, "")
       }
+
     }
 
     hasNextMatchRec(schedules._2)
   }
 
   def formatSchedule(list: (List[Int], String)): String = {
-    s"[${list._1.head}月${list._1(1)}日: ${list._2}]"
+    s"　${list._1.head}年${list._1(1)}月${list._1(2)}日: ${list._2}　"
   }
 }

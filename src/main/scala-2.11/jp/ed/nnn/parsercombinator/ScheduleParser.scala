@@ -15,8 +15,8 @@ object ScheduleParser extends JavaTokenParsers {
     }
 
   def date: Parser[List[Int]] =
-    digits ~ "月" ~ digits ~ "日" ^^ {
-      t => List(t._1._1._1.toInt, t._1._2.toInt)
+    digits ~ "年" ~ digits ~ "月" ~ digits ~ "日" ^^ {
+      t => List(t._1._1._1._1._1.toInt, t._1._1._1._2.toInt, t._1._2.toInt)
     }
 
   def digits: Parser[String] = "[0-9]+".r
